@@ -88,7 +88,7 @@ export default function Login() {
             className="btn btn-primary" 
             style={{ width: '100%', padding: '1rem', marginTop: '0.5rem', opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? <div className="spinner" style={{ width: '20px', height: '20px', borderSize: '2px' }}></div> : <><Lock size={18} /> Sign In</>}
+            {loading ? <div className="spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div> : <><Lock size={18} /> Sign In</>}
           </button>
         </form>
 
