@@ -85,11 +85,14 @@ export default function ProductClient({ product }: ProductClientProps) {
               border: '1px solid var(--color-border)'
             }}>
               <Image 
-                src={product.imageUrl} 
+                src={product.imageUrl && !product.imageUrl.startsWith('/uploads/') 
+                  ? product.imageUrl 
+                  : "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=800"} 
                 alt={product.title} 
                 fill
                 priority
                 style={{ objectFit: 'cover' }}
+                unoptimized={true}
               />
               <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem' }}>
                 <div style={{ 

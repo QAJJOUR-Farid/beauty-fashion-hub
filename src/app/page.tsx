@@ -166,12 +166,15 @@ export default function Home() {
                 }}>
                   <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/5', flexShrink: 0 }}>
                     <Image 
-                      src={product.imageUrl} 
+                      src={product.imageUrl && !product.imageUrl.startsWith('/uploads/') 
+                        ? product.imageUrl 
+                        : "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=800"} 
                       alt={product.title} 
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }}
                       className="product-img"
+                      unoptimized={true} // Add this to bypass some Vercel optimization issues for external links
                     />
                     <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: 'var(--color-badge-bg)', backdropFilter: 'blur(10px)', padding: '0.5rem 1rem', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--color-badge-text)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       <Play size={12} fill="currentColor" /> WATCH VIRAL
