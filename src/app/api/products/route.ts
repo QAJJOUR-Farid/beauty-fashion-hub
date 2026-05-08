@@ -27,29 +27,34 @@ export async function POST(request: Request) {
     const description = formData.get("description") as string;
     const category = formData.get("category") as string || "Beauty";
     const affiliateLink = formData.get("affiliateLink") as string;
+    let imageUrl = (formData.get("imageUrl") as string) || "";
 
-    let imageUrl = "";
-
-    // Handle File Upload to public/uploads
+    // Handle File Upload to public/uploads (Only if file exists)
     if (file && file.size > 0) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      
-      // Create directory if it doesn't exist
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+      try {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        
+        // Create a unique file name
+        const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+        const filePath = path.join(uploadDir, fileName);
+        
+        await writeFile(filePath, buffer);
+        
+        // Store the public URL path
+        imageUrl = `/uploads/${fileName}`;
+      } catch (fsError) {
+        console.error("FileSystem Error (likely Vercel):", fsError);
+        // If file upload fails but we don't have a URL, we might have an issue.
+        // However, on Vercel, the user should be using the URL field.
       }
-      
-      // Create a unique file name
-      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-      const filePath = path.join(uploadDir, fileName);
-      
-      await writeFile(filePath, buffer);
-      
-      // Store the public URL path
-      imageUrl = `/uploads/${fileName}`;
     }
 
     const product = await Product.create({

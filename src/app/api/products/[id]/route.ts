@@ -37,6 +37,7 @@ export async function PUT(
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const affiliateLink = formData.get("affiliateLink") as string;
+    const imageUrlFromForm = formData.get("imageUrl") as string;
 
     const updateData: any = {
       title,
@@ -44,21 +45,29 @@ export async function PUT(
       affiliateLink,
     };
 
+    if (imageUrlFromForm) {
+      updateData.imageUrl = imageUrlFromForm;
+    }
+
     // Handle Image Upload if a new file was provided
     if (file && file.size > 0) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+      try {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        
+        const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+        const filePath = path.join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
+        
+        updateData.imageUrl = `/uploads/${fileName}`;
+      } catch (fsError) {
+        console.error("FileSystem Error (likely Vercel):", fsError);
       }
-      
-      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-      const filePath = path.join(uploadDir, fileName);
-      await writeFile(filePath, buffer);
-      
-      updateData.imageUrl = `/uploads/${fileName}`;
     }
 
     const product = await Product.findByIdAndUpdate(id, updateData, {

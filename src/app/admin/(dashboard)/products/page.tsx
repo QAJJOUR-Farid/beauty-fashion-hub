@@ -59,7 +59,7 @@ export default function ProductsManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingId && !imageFile) return alert("Please select an image.");
+    if (!editingId && !imageFile && !currentImageUrl) return alert("Please provide an image (URL or file).");
 
     try {
       const formData = new FormData();
@@ -67,6 +67,7 @@ export default function ProductsManager() {
       formData.append("description", description);
       formData.append("category", category);
       formData.append("affiliateLink", affiliateLink);
+      formData.append("imageUrl", currentImageUrl); // Send the URL field
       if (imageFile) {
         formData.append("image", imageFile);
       }
@@ -148,25 +149,31 @@ export default function ProductsManager() {
 
             <div>
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>
-                Product Image {editingId ? "(Select new file to change)" : "(Upload from PC)"}
+                Product Image
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {editingId && currentImageUrl && !imageFile && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img src={currentImageUrl} alt="Current" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
-                    <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Current Image</span>
-                  </div>
-                )}
+                {/* URL Input (Best for Vercel) */}
                 <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                   <ImageIcon size={18} style={{ position: 'absolute', left: '0.75rem', color: 'var(--color-text-muted)' }} />
                   <input 
-                    type="file" 
-                    accept="image/*" 
-                    required={!editingId}
-                    onChange={e => e.target.files && setImageFile(e.target.files[0])} 
+                    type="url" 
+                    value={currentImageUrl} 
+                    onChange={e => setCurrentImageUrl(e.target.value)} 
+                    placeholder="Paste Image URL (e.g. from Pinterest/Amazon)" 
                     style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: 'var(--color-background)', color: 'var(--color-text-main)' }} 
                   />
                 </div>
+                
+                <div style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>— OR —</div>
+
+                {/* File Upload (Works on Local PC only) */}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={e => e.target.files && setImageFile(e.target.files[0])} 
+                  style={{ width: '100%', fontSize: '0.8rem' }} 
+                />
+                {imageFile && <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)' }}>Selected: {imageFile.name}</div>}
               </div>
             </div>
 
